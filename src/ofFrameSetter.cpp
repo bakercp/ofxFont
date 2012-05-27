@@ -17,11 +17,62 @@ vector<ofRectangle> ofFrameSetter::splitLines(ofPath& boundingPath, ofRectangle&
     
 }
 
+ofRectangle ofFrameSetter::addRectToRect(const ofRectangle& rect,const ofRectangle& rect1) {
+    float x0 = MIN(rect.x, rect1.x);
+    float x1 = MAX(rect.x + rect.width, rect1.x + rect.width);
+    float y0 = MIN(rect.y, rect1.y);
+    float y1 = MAX(rect.y + rect.height, rect1.y + rect.height);
+    float _w = x1 - x0;
+    float _h = y1 - y0;
+    return ofRectangle(x0,y0,_w,_h);
+}
+
+ofPolyline ofFrameSetter::rectToPolyline(ofRectangle rect) {
+    ofPolyline polyline;
+    polyline.addVertex(rect.x,rect.y);
+    polyline.addVertex(rect.x + rect.width, rect.y);
+    polyline.addVertex(rect.x + rect.width, rect.y + rect.height);
+    polyline.addVertex(rect.x, rect.y + rect.height);
+    polyline.close();
+    return polyline;
+
+}
+
+bool ofFrameSetter::isInsidePath(ofPath path, ofPoint p) {
+    
+    // THIS IS AN ESTIMATE based on the poly line.
+    // certainly more accurate ways to do when mode==PATHS
+    // this is a simple extension of the polyline crossing algorithm
+    // using ray casting across polys, including holes
+    // TODO: account for winding?
+    vector<ofPolyline> polys = path.getOutline();
+    
+    int count = 0;
+    for(int i = 0; i < polys.size(); i++) {
+        count +=  polys[i].inside(p.x,p.y) ? 1 : 0;
+    }
+    return count % 2;
+
+}
+ofRectangle ofFrameSetter::getBoundingBox(ofPath& path) {
+    vector<ofPolyline> lines = path.getOutline();
+    ofRectangle bb;
+    for(int i = 0; i < lines.size(); i++) {
+        ofRectangle thisBB = lines[i].getBoundingBox();
+        if(i == 0) { 
+            bb = thisBB;
+        } else {
+            bb = addRectToRect(bb,lines[i].getBoundingBox());
+        }
+    }
+    return bb;
+}
+
 
 vector<ofRectangle> ofFrameSetter::createLines(ofPath& path, float lineHeight, ofTextFrameProgression tfp) {
     
     vector<ofRectangle> rectangleBlock;
-    ofRectangle bb = path.getBoundingBox();
+    ofRectangle bb = getBoundingBox(path);
     
     
     if(tfp == OF_TEXT_FRAME_PROGRESS_RIGHTTOLEFT) {
@@ -66,7 +117,7 @@ vector<ofRectangle> ofFrameSetter::createLines(ofPath& path, float lineHeight, o
                         ofPoint xlp0 = ofPoint(ul.p0.x,bb.y+bb.height+epsilon);
                         ofPoint xlp1 = ofPoint(ul.p1.x,bb.y+bb.height+epsilon);
 
-                       /*
+                       
                         // intersect upwards
                         bool X_tp0 = ofLineSegmentIntersection(ll.p0,xtp0,ul.p0,ul.p1,p);
                         bool X_tp1 = ofLineSegmentIntersection(ll.p1,xtp1,ul.p0,ul.p1,p);
@@ -74,19 +125,20 @@ vector<ofRectangle> ofFrameSetter::createLines(ofPath& path, float lineHeight, o
                         // intersect downwards
                         bool X_lp0 = ofLineSegmentIntersection(ul.p0,xlp0,ll.p0,ll.p1,p);
                         bool X_lp1 = ofLineSegmentIntersection(ul.p1,xlp1,ll.p0,ll.p1,p);
-                        */
-                         
-                        // intersection issue when line is coincident https://skitch.com/bakercp/8apmg/skitched-20120502-134532
-                        // intersect upwards ( could use static ofLineSegmentIntersection in ofMath.h )
-                        bool X_tp0 = ofLineSegment::ofLineIntersects(ofLineSegment(ll.p0,xtp0),ofLineSegment(ul.p0,ul.p1),p);
-                        bool X_tp1 = ofLineSegment::ofLineIntersects(ofLineSegment(ll.p1,xtp1),ofLineSegment(ul.p0,ul.p1),p);
                         
-                        // intersect downwards
-                        bool X_lp0 = ofLineSegment::ofLineIntersects(ofLineSegment(ul.p0,xlp0),ofLineSegment(ll.p0,ll.p1),p);
-                        bool X_lp1 = ofLineSegment::ofLineIntersects(ofLineSegment(ul.p1,xlp1),ofLineSegment(ll.p0,ll.p1),p);
+                        // TODO: fix this algo in the ofLineSegment class ...
                         
-                        ofPoint pp;
-                        bool X_lp0A = ofLineSegmentIntersection(ul.p0,xlp0,ll.p0,ll.p1,pp);
+//                        // intersection issue when line is coincident https://skitch.com/bakercp/8apmg/skitched-20120502-134532
+//                        // intersect upwards ( could use static ofLineSegmentIntersection in ofMath.h )
+//                        bool X_tp0 = ofLineSegment::ofLineIntersects(ofLineSegment(ll.p0,xtp0),ofLineSegment(ul.p0,ul.p1),p);
+//                        bool X_tp1 = ofLineSegment::ofLineIntersects(ofLineSegment(ll.p1,xtp1),ofLineSegment(ul.p0,ul.p1),p);
+//                        
+//                        // intersect downwards
+//                        bool X_lp0 = ofLineSegment::ofLineIntersects(ofLineSegment(ul.p0,xlp0),ofLineSegment(ll.p0,ll.p1),p);
+//                        bool X_lp1 = ofLineSegment::ofLineIntersects(ofLineSegment(ul.p1,xlp1),ofLineSegment(ll.p0,ll.p1),p);
+//                        
+//                        ofPoint pp;
+//                        bool X_lp0A = ofLineSegmentIntersection(ul.p0,xlp0,ll.p0,ll.p1,pp);
 
                         
                         
@@ -95,36 +147,36 @@ vector<ofRectangle> ofFrameSetter::createLines(ofPath& path, float lineHeight, o
                             ofRectangle rect(ll.p0.x,lastY,0,lineHeight);
                             if(X_tp1) {
                                 rect.width = ll.p1.x-ll.p0.x;
-                                if(rect.width <= 0) cout << "11" << endl; 
+//                                if(rect.width <= 0) cout << "11" << endl; 
                                     rectangleBlock.push_back(rect);
                             } else if(X_lp0) {
                                 rect.width = ul.p0.x-ll.p0.x;
-                                if(rect.width <= 0) cout << "22" << endl; 
-                                if(rect.width == 0) {
-                                    cout << "22!!>" << pp << "<>" << p << endl;
-                                } 
+//                                if(rect.width <= 0) cout << "22" << endl; 
+//                                if(rect.width == 0) {
+//                                    cout << "22!!>" << pp << "<>" << p << endl;
+//                                } 
                                     rectangleBlock.push_back(rect);
                             } else if(X_lp1) {
                                 rect.width = ul.p1.x-ll.p0.x;
-                                if(rect.width <= 0) cout << "33" << endl; 
+//                                if(rect.width <= 0) cout << "33" << endl; 
                                 rectangleBlock.push_back(rect);
                             }
                         } else if(X_tp1) {
                             ofRectangle rect(ll.p1.x,lastY,0,lineHeight);
                             if(X_lp0) {
                                 rect.width = ul.p0.x-ll.p1.x;
-                                if(rect.width <= 0) cout << "44" << endl; 
+//                                if(rect.width <= 0) cout << "44" << endl; 
                                 rectangleBlock.push_back(rect);
                             } else if(X_lp1) {
                                 rect.width = ul.p1.x-ul.p1.x;
-                                if(rect.width <= 0) cout << "55" << endl; 
+//                                if(rect.width <= 0) cout << "55" << endl; 
                                 rectangleBlock.push_back(rect);
                             }
                         } else if(X_lp0) {
                             ofRectangle rect(ul.p0.x,lastY,0,lineHeight);
                             if(X_lp1) {
                                 rect.width = ul.p1.x-ul.p0.x;
-                                if(rect.width <= 0) cout << "66" << endl; 
+//                                if(rect.width <= 0) cout << "66" << endl; 
                                 rectangleBlock.push_back(rect);
                             }
                         }
@@ -192,7 +244,7 @@ vector< ofLineSegment > ofFrameSetter::clipLineToPath(ofPath& path, const ofLine
     
     // if line midpoint is inside, then we assume it is inside
     for(int i = 1; i < (int)intersections.size(); i++) {
-        if(path.inside(intersections[i-1].getMiddle(intersections[i]))) {
+        if(isInsidePath(path,intersections[i-1].getMiddle(intersections[i]))){
             ofLineSegment thisLine(intersections[i-1],intersections[i]);
             insideLines.push_back(thisLine);
         }

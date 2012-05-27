@@ -60,7 +60,11 @@ float ofLineSegment::getSlope() {
 
 //----------------------------------------------------------
 ofRectangle ofLineSegment::getBoundingBox() {
-    return ofRectangle(p0,p1);
+    float x = p0.x;
+    float y = p0.y;
+    float width  = p1.x - p0.x;
+    float height = p1.y - p0.y;
+    return ofRectangle(x,y,width,height);
 }
 
 //----------------------------------------------------------

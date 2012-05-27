@@ -12,7 +12,6 @@
 
 class ofFont;
 
-typedef signed int ofUniCharGlyphIdx;
 
 class ofGlyph {
 public:

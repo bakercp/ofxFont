@@ -4,7 +4,7 @@
 #include "ofFont.h"
 #include "ofGlyph.h"
 
-//class ofGlyph;
+class ofGlyph;
 
 class ofMappedGlyph {
 public:  

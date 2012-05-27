@@ -34,7 +34,7 @@ void testApp::setup(){
     boundingPath.lineTo(ofPoint(ofGetWidth()-margin,ofGetHeight()-margin));
     boundingPath.lineTo(ofPoint(ofGetWidth()/2,ofGetHeight()/2+margin));
     boundingPath.lineTo(ofPoint(margin,ofGetHeight()-margin));
-
+    boundingPath.scale(.5, .5);
     boundingPath.close();  
     boundingPath.setFilled(false);
 
@@ -98,16 +98,23 @@ void testApp::setupFonts() {
     
     ttf3.loadFont(settings);
     
-    amperPath = ttf1.getGlyphPath(0x03FF);//(ofUniChar)'&');
+    amperPath = ttf1.getGlyphPath((ofUniChar)'&');
 
     amperPath.scale(10,10);
     amperPath.setFilled(false);
-    amperPath.translate(ofPoint(100,600));
+    amperPath.translate(ofPoint(10,510));
+    
+    circlePath.arc(0,0,100,100,0,360);
+//    circlePath.scale(10,10);
+    circlePath.setFilled(false);
+    circlePath.translate(ofPoint(10,510));
+
+    
     
     frame = frameSetter.createFrame("This is a test.", amperPath);
+    frame2 = frameSetter.createFrame("This is also a test", boundingPath);
+    frame2 = frameSetter.createFrame("This is also a test", circlePath);
 
-  
-    
 }
 
 //--------------------------------------------------------------
@@ -127,11 +134,18 @@ void testApp::draw(){
     int _x = x;
     int _y = y;
 
-    ofRectangle bb = ofRectangle(x,y,mouseX-x,mouseY-y);
+   // ofRectangle bb = ofRectangle(x,y,mouseX-x,mouseY-y);
     
-    rects = frameSetter.createLines(amperPath, ofMap(ofGetMouseX(), 0, ofGetWidth(), 2, 100));
+    float lineHeight = ofMap(ofGetMouseX(), 0, ofGetWidth(), 2, 100); 
+    
+    frameRects = frameSetter.createLines(amperPath, lineHeight);
+    frame2Rects = frameSetter.createLines(boundingPath, lineHeight);
+    frame3Rects = frameSetter.createLines(circlePath, lineHeight);
 
-    bool in = amperPath.inside(ofGetMouseX(), ofGetMouseY());
+    //bool in = amperPath.inside(ofGetMouseX(), ofGetMouseY());
+    
+    bool in = ofFrameSetter::isInsidePath(amperPath, ofPoint(ofGetMouseX(), ofGetMouseY())) ||
+              ofFrameSetter::isInsidePath(boundingPath, ofPoint(ofGetMouseX(), ofGetMouseY()));
     
     if(in) {
         ofSetColor(0,255,0);
@@ -186,30 +200,18 @@ void testApp::draw(){
     ofPushMatrix();
    // ofTranslate(x,y);
     
+    drawPathAndRects(amperPath,frameRects);
+    
+    ofTranslate(500,0);
+    drawPathAndRects(boundingPath,frame2Rects);
+    ofTranslate(200,0);
+    drawPathAndRects(circlePath,frame3Rects);
 
-    amperPath.draw(0,0);
-    for(int k = 0; k < rects.size(); k++) {
-        ofSetColor(0,255,255);
-        ofNoFill();
-
-        ofRect(rects[k]);
-        ofSetColor(0,255,255,80);
-        ofFill();
-        
-        ofRect(rects[k]);
-        
-        if(rects[k].width == 0.0f) {
-            ofNoFill();
-            ofSetColor(255,0,0);
-            ofRect(rects[k]);
-        }
-        
-    }
     
     
     ofTranslate(100,100);
     
-    ofPolyline pp = bb.getAsPolyline();
+    //ofPolyline pp = ofFrameSetter::rectToPolyline(bb);
     //vector<ofRectangle> rectangles = ttf1.subdivideBoundingPolygon(boundingPolygon,ttf1.getLineHeight());
 
     ofEnableAlphaBlending();
@@ -234,11 +236,13 @@ void testApp::draw(){
     
  //   ofTextBlock tb = ttf1.textLayout(txt, pp,true,false);
 
-    ofNoFill();
-    ofSetColor(255,255,255);
-    boundingPath.draw();
-    ofSetColor(255,0,0);
-    ofRect(boundingPath.getBoundingBox());
+//    ofNoFill();
+//    ofSetColor(255,255,255);
+//    boundingPath.draw();
+//    ofSetColor(255,0,0);
+//    ofRect(ofFrameSetter::getBoundingBox(boundingPath));
+    
+    
     
     /*
     cout << "------------------------" << endl;
@@ -312,7 +316,7 @@ void testApp::draw(){
     
     ofNoFill();
     ofSetColor(255,255,0);
-    ofRect(bb);
+    //ofRect(bb);
 
 
     ofDisableAlphaBlending();

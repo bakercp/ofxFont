@@ -1,6 +1,9 @@
 #pragma once
 
 #include "ofMain.h"
+
+#include "ofFontTypes.h"
+
 #include "ofUnicode.h"
 #include "ofGlyph.h"
 #include "ofMappedGlyph.h"
@@ -23,6 +26,7 @@ class ofGlyph;
 #define PARAMETER_UNKNOWN              -1
 typedef unsigned int     ofUniCharCount;
 typedef ofUniCharCount*  ofUniCharCountPtr;
+
 
 class ofFont {
 public:

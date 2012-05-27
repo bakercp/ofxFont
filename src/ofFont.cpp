@@ -356,10 +356,10 @@ bool ofFont::loadFont(Settings _settings) {
     if ( err == FT_Err_Unknown_File_Format )
     {
         ofLog(OF_LOG_ERROR,"ofFont::loadFont - Error loading font - unknown file format %d", err);
-        return;
+        return false;
     } else if ( err ) {
         ofLog(OF_LOG_ERROR,"ofFont::loadFont - Error loading font - corrupt file? %d", err);
-        return;
+        return false;
     }
 
     slot = face->glyph;  /* a small shortcut */
@@ -782,7 +782,17 @@ void ofFont::drawChar(ofUniCharGlyphIdx glyphIdx, ofPoint p , bool drawAsPath) {
         
         if(drawAsPath) {
             glyphPaths[glyphIdx].path.setFilled(ofGetStyle().bFill);
-            glyphPaths[glyphIdx].path.draw(p);
+///            glyphPaths[glyphIdx].path.draw(p);
+            
+            // no core support
+            ofPushMatrix();
+            ofTranslate(p);
+            glyphPaths[glyphIdx].path.draw();
+            ofPopMatrix();
+
+            
+            
+            
         } else {
             bool alreadyBinded = binded;
             if(!alreadyBinded) bind();

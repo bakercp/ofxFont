@@ -25,6 +25,29 @@ class testApp : public ofBaseApp{
     
     void setupFonts();
 
+    void drawPathAndRects(ofPath& path, vector<ofRectangle>& rects) {
+        
+        path.draw(0,0);
+
+        for(int k = 0; k < rects.size(); k++) {
+            ofSetColor(0,255,255);
+            ofNoFill();
+            
+            ofRect(rects[k]);
+            ofSetColor(0,255,255,80);
+            ofFill();
+            
+            ofRect(rects[k]);
+            
+            if(rects[k].width == 0.0f) {
+                ofNoFill();
+                ofSetColor(255,0,0);
+                ofRect(rects[k]);
+            }
+            
+        }
+    }
+    
     ofFont ttf0;
     ofFont ttf1;
     ofFont ttf2;
@@ -35,11 +58,16 @@ class testApp : public ofBaseApp{
     
     ofPath boundingPath;
     ofPath amperPath;
+    ofPath circlePath;
     ofFrameSetter frameSetter;
     
-    vector<ofRectangle> rects;
+    vector<ofRectangle> frameRects;
+    vector<ofRectangle> frame2Rects;
+    vector<ofRectangle> frame3Rects;
     
     ofTextFrame frame;
+    ofTextFrame frame2;
+    ofTextFrame frame3;
     
     string txt;
     string ttx;

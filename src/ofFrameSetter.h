@@ -64,9 +64,12 @@ public:
     static vector<ofRectangle> splitLines(ofPath& boundingPath, ofRectangle& testRect);
     static vector<ofLineSegment> clipLineToPath(ofPath& path, const ofLineSegment& line);
 
-
-
     
-    
+    // hacks due to no core support yet.
+
+    static bool isInsidePath(ofPath path, ofPoint p);
+    static ofRectangle getBoundingBox(ofPath& path);
+    static ofRectangle addRectToRect(const ofRectangle& rect,const ofRectangle& rect1);
+    static ofPolyline rectToPolyline(ofRectangle rect);
                             
 };
