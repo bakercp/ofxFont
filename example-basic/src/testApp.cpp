@@ -70,7 +70,7 @@ void testApp::setupFonts() {
     
     ////////
     
-    settings.fontFilename = "Arial Unicode.ttf";//"FreeSerif.ttf";
+    settings.fontFilename = "Lucida Sans Unicode.ttf";//"FreeSerif.ttf";
     settings.fontSize = 50;
     settings.bAntiAliased = true;
     settings.bForceAutoHinting = false;
@@ -186,6 +186,9 @@ void testApp::draw(){
     ttf3.drawChar((ofUniChar)0x20AC,ofPoint(0,0),true);
     ttf3.drawChar((ofUniChar)'&',ofPoint(20,0),false);
     ttf3.drawChar((ofUniChar)'&',ofPoint(40,0),true);
+    
+    ttf1.drawChar(ofTextConverter::toUnicode("Å")[0],ofPoint(80,0),true);
+    
    // ofDisableAlphaBlending();
     
     ofPopMatrix();

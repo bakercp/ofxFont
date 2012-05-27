@@ -4,6 +4,9 @@
 //#include "ofTextUtils.h"
 #include "ofFrameSetter.h"
 
+#include "ofTextConverter.h"
+#include "ofUTF8.h"
+
 
 class testApp : public ofBaseApp{
 
