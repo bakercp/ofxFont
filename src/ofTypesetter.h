@@ -17,8 +17,8 @@ A framesetter encapsulates a typesetter and provides a reference to it as a conv
 */
 
 #include "ofMain.h"
-#include "linebreak.h"
-#include "linebreakdef.h"
+//#include "linebreak.h"
+//#include "linebreakdef.h"
 
 enum ofTypesetterLanguage {
     // very limited set used for linebreaker

@@ -62,6 +62,7 @@ string ofTypesetter::hyphenate(string utf8String) {
 //------------------------------------------------------------------
 vector<ofUniCharBreak> ofTypesetter::breakLines(string utf8String) {
    
+    /*
     string language = ofTextLangaugeToString(lang);
 
     const ofUTF8Char* buffer = reinterpret_cast<const ofUTF8Char*>(utf8String.c_str());
@@ -100,6 +101,7 @@ vector<ofUniCharBreak> ofTypesetter::breakLines(string utf8String) {
             cout << "LINEBREAK_INSIDEACHAR" << endl;
         }
     }
+     */
 }
 
 //------------------------------------------------------------------
