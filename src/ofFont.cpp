@@ -864,7 +864,7 @@ void ofFont::drawCharTex(ofUniCharGlyphIdx glyphIdx , ofPoint position) {
 
 //-----------------------------------------------------------
 void ofFont::drawCharTex(ofUniChar unicode, ofPoint position) {
-    drawChar(unicode,unicode,false);
+    drawChar(unicode,position,false);
 }
 
 

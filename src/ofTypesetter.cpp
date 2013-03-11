@@ -39,7 +39,7 @@ ofTypesetter::~ofTypesetter() {}
 //------------------------------------------------------------------
 void ofTypesetter::setFont(ofFont* _font) {
     if(_font != NULL) {
-        font = font;
+        font = _font;
     }
 }
 
