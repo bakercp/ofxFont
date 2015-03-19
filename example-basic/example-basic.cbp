@@ -209,6 +209,9 @@
 		<Unit filename="../src/ofFont.h">
 			<Option virtualFolder="addons/ofxFont/src" />
 		</Unit>
+		<Unit filename="../src/ofFontTypes.h">
+			<Option virtualFolder="addons/ofxFont/src" />
+		</Unit>
 		<Unit filename="../src/ofFormattedText.h">
 			<Option virtualFolder="addons/ofxFont/src" />
 		</Unit>
