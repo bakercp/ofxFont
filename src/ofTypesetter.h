@@ -19,6 +19,8 @@ A framesetter encapsulates a typesetter and provides a reference to it as a conv
 #include "ofMain.h"
 //#include "linebreak.h"
 //#include "linebreakdef.h"
+#include "ofFont.h"
+#include "ofUnicode.h"
 
 enum ofTypesetterLanguage {
     // very limited set used for linebreaker
@@ -42,7 +44,7 @@ enum ofTypesetterWordwrap {
     OF_TYPESETTER_WORDWRAP_NONE,
     OF_TYPESETTER_WORDWRAP_WRAP,
     OF_TYPESETTER_WORDWRAP_OVERFLOW,
-    
+
 //    WrapWithOverflow,
 //    NoWrap,
 //    Wrap
@@ -64,7 +66,7 @@ public:
         c           = _c;
         breakStatus = _breakStatus;
     }
-    
+
     ofUniChar  c;
     char       breakStatus;
 };
@@ -77,29 +79,29 @@ class ofTypesetter {
 public:
     ofTypesetter();
     virtual ~ofTypesetter();
-    
+
     void setFont(ofFont* font);
     ofFont* getFont();
     bool isFontLoaded();
-    
-    
+
+
     string hyphenate(string utf8String);
-    
+
     vector<ofUniCharBreak> breakLines(string utf8String);
-    
+
     void setLanguage(ofTypesetterLanguage lang);
     ofTypesetterLanguage getLanguage();
 
-    
+
     //int suggestLineBreak(string utf8String, float width, int startIndex = 0);
     //int suggestLineBreakWithOffset(string utf8String, float width, int startIndex = 0, float offset = 0.0f);
-    
+
     //ofTypesetterWordwrap
     //ofTypesetterLineEnding
     //ofTypesetterFlowDirection
-    
+
 protected:
-    
+
 private:
     ofFont* font;
 
