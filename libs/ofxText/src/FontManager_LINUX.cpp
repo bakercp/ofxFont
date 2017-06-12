@@ -13,7 +13,6 @@
 
 
 #include <fontconfig/fontconfig.h>
-#include "FontDescriptor.h"
 
 
 namespace ofx {
@@ -120,7 +119,7 @@ FontWidth convertWidth(int width) {
   }
 }
 
-FontDescriptor *createFontDescriptor(FcPattern *pattern) {
+FontDescriptor createFontDescriptor(FcPattern *pattern) {
   FcChar8 *path, *psName, *family, *style;
   int weight, width, slant, spacing;
 
@@ -134,37 +133,40 @@ FontDescriptor *createFontDescriptor(FcPattern *pattern) {
   FcPatternGetInteger(pattern, FC_SLANT, 0, &slant);
   FcPatternGetInteger(pattern, FC_SPACING, 0, &spacing);
 
-  return new FontDescriptor(
-    (char *) path,
-    (char *) psName,
-    (char *) family,
-    (char *) style,
-    convertWeight(weight),
-    convertWidth(width),
-    slant == FC_SLANT_ITALIC,
-    spacing == FC_MONO
-  );
+  FontDescriptor result;
+
+  result.path = std::string(path ? path : "");
+  result.postscriptName = std::string(psName ? psName : "");
+  result.family = std::string(family ? family : "");
+  result.style = std::string(style ? style : "");
+  result.weight = convertWeight(weight);
+  result.width = convertWidth(width);
+  result.italic = (slant == FC_SLANT_ITALIC);
+  result.monospace = (spacing == FC_MONO);
+
+  return result;
 }
 
-ResultSet *getResultSet(FcFontSet *fs) {
-  ResultSet *res = new ResultSet();
-  if (!fs)
-    return res;
+std::vector<FontDescriptor> getResultSet(FcFontSet *fs) {
+    std::vector<FontDescriptor> res;
+
+    if (!fs)
+        return res;
 
   for (int i = 0; i < fs->nfont; i++) {
-    res->push_back(createFontDescriptor(fs->fonts[i]));
+    res.push_back(createFontDescriptor(fs->fonts[i]));
   }
 
   return res;
 }
 
-ResultSet *getAvailableFonts() {
+std::vector<FontDescriptor> FontManager::getAvailableFonts() {
   FcInit();
 
   FcPattern *pattern = FcPatternCreate();
   FcObjectSet *os = FcObjectSetBuild(FC_FILE, FC_POSTSCRIPT_NAME, FC_FAMILY, FC_STYLE, FC_WEIGHT, FC_WIDTH, FC_SLANT, FC_SPACING, NULL);
   FcFontSet *fs = FcFontList(NULL, pattern, os);
-  ResultSet *res = getResultSet(fs);
+  std::vector<FontDescriptor> res = getResultSet(fs);
   
   FcPatternDestroy(pattern);
   FcObjectSetDestroy(os);
@@ -174,39 +176,39 @@ ResultSet *getAvailableFonts() {
 }
 
 
-FcPattern *createPattern(FontDescriptor *desc) {
+FcPattern *createPattern(const FontDescriptor& desc) {
   FcInit();
   FcPattern *pattern = FcPatternCreate();
 
-  if (desc->postscriptName)
-    FcPatternAddString(pattern, FC_POSTSCRIPT_NAME, (FcChar8 *) desc->postscriptName);
+  if (!desc.postscriptName.empty())
+    FcPatternAddString(pattern, FC_POSTSCRIPT_NAME, (FcChar8 *) desc.postscriptName.data());
 
-  if (desc->family)
-    FcPatternAddString(pattern, FC_FAMILY, (FcChar8 *) desc->family);
+  if (!desc.family.empty())
+    FcPatternAddString(pattern, FC_FAMILY, (FcChar8 *) desc.family.data());
 
-  if (desc->style)
-    FcPatternAddString(pattern, FC_STYLE, (FcChar8 *) desc->style);
+  if (!desc.style.empty())
+    FcPatternAddString(pattern, FC_STYLE, (FcChar8 *) desc.style.data());
 
-  if (desc->italic)
+  if (desc.italic)
     FcPatternAddInteger(pattern, FC_SLANT, FC_SLANT_ITALIC);
 
-  if (desc->weight)
-    FcPatternAddInteger(pattern, FC_WEIGHT, convertWeight(desc->weight));
+  if (desc.weight)
+    FcPatternAddInteger(pattern, FC_WEIGHT, convertWeight(desc.weight));
 
-  if (desc->width)
-    FcPatternAddInteger(pattern, FC_WIDTH, convertWidth(desc->width));
+  if (desc.width)
+    FcPatternAddInteger(pattern, FC_WIDTH, convertWidth(desc.width));
 
-  if (desc->monospace)
+  if (desc.monospace)
     FcPatternAddInteger(pattern, FC_SPACING, FC_MONO);
 
   return pattern;
 }
 
-ResultSet *findFonts(FontDescriptor *desc) {
+std::vector<FontDescriptor> FontManager::findFonts(const FontDescriptor& desc) {
   FcPattern *pattern = createPattern(desc);
   FcObjectSet *os = FcObjectSetBuild(FC_FILE, FC_POSTSCRIPT_NAME, FC_FAMILY, FC_STYLE, FC_WEIGHT, FC_WIDTH, FC_SLANT, FC_SPACING, NULL);
   FcFontSet *fs = FcFontList(NULL, pattern, os);
-  ResultSet *res = getResultSet(fs);
+  std::vector<FontDescriptor> res = getResultSet(fs);
 
   FcFontSetDestroy(fs);
   FcPatternDestroy(pattern);
@@ -215,14 +217,14 @@ ResultSet *findFonts(FontDescriptor *desc) {
   return res;
 }
 
-FontDescriptor *findFont(FontDescriptor *desc) {
+FontDescriptor FontManager::findFont(const FontDescriptor& desc) {
   FcPattern *pattern = createPattern(desc);
   FcConfigSubstitute(NULL, pattern, FcMatchPattern);
   FcDefaultSubstitute(pattern);
 
   FcResult result;
   FcPattern *font = FcFontMatch(NULL, pattern, &result);
-  FontDescriptor *res = createFontDescriptor(font);
+  FontDescriptor res = createFontDescriptor(font);
 
   FcPatternDestroy(pattern);
   FcPatternDestroy(font);
@@ -230,20 +232,20 @@ FontDescriptor *findFont(FontDescriptor *desc) {
   return res;
 }
 
-FontDescriptor *substituteFont(char *postscriptName, char *string) {
+FontDescriptor FontManager::substituteFont(const std::string& postscriptName, const std::string& utf8Text) {
   FcInit();
 
   // create a pattern with the postscript name
   FcPattern* pattern = FcPatternCreate();
-  FcPatternAddString(pattern, FC_POSTSCRIPT_NAME, (FcChar8 *) postscriptName);
+  FcPatternAddString(pattern, FC_POSTSCRIPT_NAME, (FcChar8 *) postscriptName.data());
 
   // create a charset with each character in the string
   FcCharSet* charset = FcCharSetCreate();
-  int len = strlen(string);
+  int len = utf8Text.length();
 
   for (int i = 0; i < len;) {
     FcChar32 c;
-    i += FcUtf8ToUcs4((FcChar8 *)string + i, &c, len - i);
+    i += FcUtf8ToUcs4((FcChar8 *)utf8Text.data() + i, &c, len - i);
     FcCharSetAddChar(charset, c);
   }
 
@@ -256,7 +258,7 @@ FontDescriptor *substituteFont(char *postscriptName, char *string) {
   // find the best match font
   FcResult result;
   FcPattern *font = FcFontMatch(NULL, pattern, &result);
-  FontDescriptor *res = createFontDescriptor(font);
+  FontDescriptor res = createFontDescriptor(font);
 
   FcPatternDestroy(pattern);
   FcPatternDestroy(font);
