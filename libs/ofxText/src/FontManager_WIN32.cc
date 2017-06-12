@@ -13,10 +13,11 @@
 
 
 #define WINVER 0x0600
-#include "FontDescriptor.h"
 #include <dwrite.h>
 #include <dwrite_1.h>
 #include <unordered_set>
+#pragma comment(lib, "Dwrite")
+
 
 // throws a JS error when there is some exception in DirectWrite
 #define HR(hr) \
@@ -103,8 +104,8 @@ char *getString(IDWriteFont *font, DWRITE_INFORMATIONAL_STRING_ID string_id) {
   return res;
 }
 
-FontDescriptor *resultFromFont(IDWriteFont *font) {
-  FontDescriptor *res = NULL;
+FontDescriptor resultFromFont(IDWriteFont *font) {
+  FontDescriptor res;
   IDWriteFontFace *face = NULL;
   unsigned int numFiles = 0;
 
@@ -145,16 +146,14 @@ FontDescriptor *resultFromFont(IDWriteFont *font) {
       IDWriteFontFace1 *face1 = static_cast<IDWriteFontFace1 *>(face);
       bool monospace = face1->IsMonospacedFont() == TRUE;
 
-      res = new FontDescriptor(
-        psName,
-        postscriptName,
-        family,
-        style,
-        (FontWeight) font->GetWeight(),
-        (FontWidth) font->GetStretch(),
-        font->GetStyle() == DWRITE_FONT_STYLE_ITALIC,
-        monospace
-      );
+	  res.path = psName;
+	  res.postscriptName = postscriptName;
+	  res.family = family;
+	  res.style = style;
+	  res.weight = (FontWeight)font->GetWeight();
+	res.width = (FontWidth)font->GetStretch();
+	res.italic = font->GetStyle() == DWRITE_FONT_STYLE_ITALIC;
+		res.monospace = monospace;
 
       delete psName;
       delete name;
@@ -173,8 +172,8 @@ FontDescriptor *resultFromFont(IDWriteFont *font) {
   return res;
 }
 
-ResultSet *getAvailableFonts() {
-  ResultSet *res = new ResultSet();
+std::vector<FontDescriptor> FontManager::getAvailableFonts() {
+	std::vector<FontDescriptor> res;
   int count = 0;
 
   IDWriteFactory *factory = NULL;
@@ -206,10 +205,10 @@ ResultSet *getAvailableFonts() {
       IDWriteFont *font = NULL;
       HR(family->GetFont(j, &font));
 
-      FontDescriptor *result = resultFromFont(font);
-      if (psNames.count(result->postscriptName) == 0) {
-        res->push_back(resultFromFont(font));
-        psNames.insert(result->postscriptName);
+      FontDescriptor result = resultFromFont(font);
+      if (psNames.count(result.postscriptName) == 0) {
+        res.push_back(resultFromFont(font));
+        psNames.insert(result.postscriptName);
       }
     }
 
@@ -222,38 +221,37 @@ ResultSet *getAvailableFonts() {
   return res;
 }
 
-bool resultMatches(FontDescriptor *result, FontDescriptor *desc) {
-  if (desc->postscriptName && strcmp(desc->postscriptName, result->postscriptName) != 0)
+bool resultMatches(const FontDescriptor& result, const FontDescriptor& desc) {
+  if (!desc.postscriptName.empty() && desc.postscriptName.compare(result.postscriptName) != 0)
     return false;
 
-  if (desc->family && strcmp(desc->family, result->family) != 0)
+  if (!desc.family.empty() && desc.family.compare(result.family) != 0)
     return false;
 
-  if (desc->style && strcmp(desc->style, result->style) != 0)
+  if (!desc.style.empty() && desc.style.compare(result.style) != 0)
     return false;
 
-  if (desc->weight && desc->weight != result->weight)
+  if (desc.weight != 0 && desc.weight != result.weight)
     return false;
 
-  if (desc->width && desc->width != result->width)
+  if (desc.width != 0 && desc.width != result.width)
     return false;
 
-  if (desc->italic != result->italic)
+  if (desc.italic != result.italic)
     return false;
 
-  if (desc->monospace != result->monospace)
+  if (desc.monospace != result.monospace)
     return false;
 
   return true;
 }
 
-ResultSet *findFonts(FontDescriptor *desc) {
-  ResultSet *fonts = getAvailableFonts();
+std::vector<FontDescriptor> FontManager::findFonts(const FontDescriptor& desc) {
+  auto fonts = getAvailableFonts();
 
-  for (ResultSet::iterator it = fonts->begin(); it != fonts->end();) {
+  for (std::vector<FontDescriptor>::iterator it = fonts.begin(); it != fonts.end();) {
     if (!resultMatches(*it, desc)) {
-      delete *it;
-      it = fonts->erase(it);
+      it = fonts.erase(it);
     } else {
       it++;
     }
@@ -262,39 +260,35 @@ ResultSet *findFonts(FontDescriptor *desc) {
   return fonts;
 }
 
-FontDescriptor *findFont(FontDescriptor *desc) {
-  ResultSet *fonts = findFonts(desc);
+FontDescriptor FontManager::findFont(const FontDescriptor& desc) {
+  auto fonts = findFonts(desc);
 
   // if we didn't find anything, try again with only the font traits, no string names
-  if (fonts->size() == 0) {
-    delete fonts;
+  if (fonts.size() == 0) {
 
-    FontDescriptor *fallback = new FontDescriptor(
-      NULL, NULL, NULL, NULL, 
-      desc->weight, desc->width, desc->italic, false
-    );
+	  FontDescriptor fallback;
+	  fallback.weight = desc.weight;
+	  fallback.width = desc.width;
+	  fallback.italic = desc.italic;
+	  fallback.monospace = false;
 
     fonts = findFonts(fallback);
   }
 
   // ok, nothing. shouldn't happen often. 
   // just return the first available font
-  if (fonts->size() == 0) {
-    delete fonts;
+  if (fonts.size() == 0) {
     fonts = getAvailableFonts();
   }
 
   // hopefully we found something now.
   // copy and return the first result
-  if (fonts->size() > 0) {
-    FontDescriptor *res = new FontDescriptor(fonts->front());
-    delete fonts;
-    return res;
+  if (fonts.size() > 0) {
+	  return fonts.front();
   }
 
-  // whoa, weird. no fonts installed or something went wrong.
-  delete fonts;
-  return NULL;
+  std::cerr << "No fonts found on system. Catastrophic error." << std::endl;
+  return FontDescriptor();
 }
 
 // custom text renderer used to determine the fallback font for a given char
@@ -413,8 +407,8 @@ public:
   }
 };
 
-FontDescriptor *substituteFont(char *postscriptName, char *string) {
-  FontDescriptor *res = NULL;
+FontDescriptor FontManager::substituteFont(const std::string& postscriptName, const std::string& utf8Text) {
+  FontDescriptor res;
 
   IDWriteFactory *factory = NULL;
   HR(DWriteCreateFactory(
@@ -428,46 +422,49 @@ FontDescriptor *substituteFont(char *postscriptName, char *string) {
   HR(factory->GetSystemFontCollection(&collection));
 
   // find the font for the given postscript name
-  FontDescriptor *desc = new FontDescriptor();
-  desc->postscriptName = postscriptName;
-  FontDescriptor *font = findFont(desc);
+  FontDescriptor desc;
+  desc.postscriptName = postscriptName;
+  FontDescriptor font = findFont(desc);
 
   // create a text format object for this font
   IDWriteTextFormat *format = NULL;
-  if (font) {
-    WCHAR *familyName = utf8ToUtf16(font->family);
+
+ // if (font) {
+    WCHAR *familyName = utf8ToUtf16(font.family.data());
 
     // create a text format
     HR(factory->CreateTextFormat(
       familyName,
       collection,
-      (DWRITE_FONT_WEIGHT) font->weight,
-      font->italic ? DWRITE_FONT_STYLE_ITALIC : DWRITE_FONT_STYLE_NORMAL,
-      (DWRITE_FONT_STRETCH) font->width,
+      (DWRITE_FONT_WEIGHT) font.weight,
+      font.italic ? DWRITE_FONT_STYLE_ITALIC : DWRITE_FONT_STYLE_NORMAL,
+      (DWRITE_FONT_STRETCH) font.width,
       12.0,
       L"en-us",
       &format
     ));
 
     delete familyName;
-    delete font;
-  } else {
-    // this should never happen, but just in case, let the system
-    // decide the default font in case findFont returned nothing.
-    HR(factory->CreateTextFormat(
-      L"",
-      collection,
-      DWRITE_FONT_WEIGHT_REGULAR,
-      DWRITE_FONT_STYLE_NORMAL,
-      DWRITE_FONT_STRETCH_NORMAL,
-      12.0,
-      L"en-us",
-      &format
-    ));
+    //delete font;
+  //}
+  /*else {
+	// this should never happen, but just in case, let the system
+	// decide the default font in case findFont returned nothing.
+	HR(factory->CreateTextFormat(
+	  L"",
+	  collection,
+	  DWRITE_FONT_WEIGHT_REGULAR,
+	  DWRITE_FONT_STYLE_NORMAL,
+	  DWRITE_FONT_STRETCH_NORMAL,
+	  12.0,
+	  L"en-us",
+	  &format
+	));
   }
+  */
 
   // convert utf8 string for substitution to utf16
-  WCHAR *str = utf8ToUtf16(string);
+  WCHAR *str = utf8ToUtf16(utf8Text.data());
 
   // create a text layout for the substitution string
   IDWriteTextLayout *layout = NULL;
@@ -494,8 +491,8 @@ FontDescriptor *substituteFont(char *postscriptName, char *string) {
   layout->Release();
   format->Release();
 
-  desc->postscriptName = NULL;
-  delete desc;
+//  desc->postscriptName = NULL;
+//  delete desc;
   delete str;
   collection->Release();
   factory->Release();
