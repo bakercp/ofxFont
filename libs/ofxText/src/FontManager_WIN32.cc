@@ -10,14 +10,12 @@
 
 
 #if defined(TARGET_WIN32)
-
+#pragma comment(lib, "Dwrite")
 
 #define WINVER 0x0600
 #include <dwrite.h>
 #include <dwrite_1.h>
 #include <unordered_set>
-#pragma comment(lib, "Dwrite")
-
 
 // throws a JS error when there is some exception in DirectWrite
 #define HR(hr) \
