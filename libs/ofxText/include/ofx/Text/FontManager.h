@@ -85,15 +85,16 @@ struct FontDescriptor
     bool italic = false;
 
     /// \brief Whether the font is monospace or not.
-    bool monospace = false;;
+    bool monospace = false;
 
     ofJson toJSON() const
     {
         ofJson json;
         json["path"] = path;
         json["postscript_name"] = postscriptName;
-        json["family"] = path;
+        json["family"] = family;
         json["style"] = style;
+        json["weight"] = weight;
         json["width"] = width;
         json["italic"] = italic;
         json["monospace"] = monospace;
