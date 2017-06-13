@@ -12,6 +12,7 @@ Project.xcconfig
 *.vcxproj
 *.vcxproj.filters
 icon.rc
+*.qbs
 
 *.mode1v3
 
