@@ -135,10 +135,10 @@ FontDescriptor createFontDescriptor(FcPattern *pattern) {
 
   FontDescriptor result;
 
-  result.path = std::string(path ? path : "");
-  result.postscriptName = std::string(psName ? psName : "");
-  result.family = std::string(family ? family : "");
-  result.style = std::string(style ? style : "");
+  result.path = std::string(path ? reinterpret_cast<const char*>(path) : "");
+  result.postscriptName = std::string(psName ? reinterpret_cast<const char*>(psName) : "");
+  result.family = std::string(family ? reinterpret_cast<const char*>(family) : "");
+  result.style = std::string(style ? reinterpret_cast<const char*>(style) : "");
   result.weight = convertWeight(weight);
   result.width = convertWidth(width);
   result.italic = (slant == FC_SLANT_ITALIC);
