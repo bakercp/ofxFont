@@ -7,51 +7,16 @@ mkdir -p ${INSTALL_PATH}
 
 echo "Installing ${THIS_NAME} data ..."
 
-if ! [ -d ${INSTALL_PATH}/examples ]; then
-  # We are using the modified version that has everything converted to libpng
-  # to get around the macOS libjpeg dulicate symbols problem.
-  # git clone --depth=1 https://github.com/davisking/dlib.git .tmp/
-  # rm .tmp/examples/*.{h,cpp,txt}
-  # mv .tmp/examples ${INSTALL_PATH}/
-  # rm -rf .tmp/
-  mkdir -p .tmp/
-  curl -L --progress-bar https://github.com/bakercp/ofxDlib/releases/download/models/examples.zip > .tmp/examples.zip
-  cd .tmp/
-  unzip examples.zip
-  cd -
-  mv .tmp/examples ${INSTALL_PATH}/
-  rm -rf .tmp/
+echo ${INSTALL_PATH}
 
+URL="https://fonts.google.com/download?family=Roboto|Lato|Raleway|Oswald|Playfair%20"
+FILE="fonts.zip"
+if ! [ -f ${INSTALL_PATH}/${FILE} ]; then
+  echo "Downloading ${URL}"
+  curl -L --progress-bar ${URL} > ${INSTALL_PATH}/${FILE}
+  pushd ${INSTALL_PATH}
+  unzip ${FILE}
+  popd
 fi
-echo "✅ ${INSTALL_PATH}/examples"
 
-
-INSTALL_PATH=${INSTALL_PATH}/models
-mkdir -p ${INSTALL_PATH}
-# BASE_URL="http://dlib.net/files"
-# BASE_URL=https://github.com/davisking/dlib-models/raw/master/"
-BASE_URL="https://github.com/bakercp/ofxDlib/releases/download/models/"
-FILES=(
-  #"dlib_face_recognition_resnet_model_v1_lfw_test_scripts.tar.bz2"
-  #"dlib_kitti_submission_mmodCNN_basic7convModel.tar.bz2"
-  #"imagenet2015_validation_images.txt.bz2"
-  "dlib_face_recognition_resnet_model_v1.dat"
-  "mmod_dog_hipsterizer.dat"
-  "mmod_front_and_rear_end_vehicle_detector.dat"
-  "mmod_human_face_detector.dat"
-  "mmod_rear_end_vehicle_detector.dat"
-  "resnet34_1000_imagenet_classifier.dnn"
-  "semantic_segmentation_voc2012net.dnn"
-  "shape_predictor_5_face_landmarks.dat"
-  "shape_predictor_68_face_landmarks.dat"
-  "mnist_network.dat"
-)
-
-for file in "${FILES[@]}"
-do
-  if ! [ -f ${INSTALL_PATH}/${file} ]; then
-    echo "Downloading ${file}.bz2"
-    curl -L --progress-bar ${BASE_URL}/${file}.bz2 | bunzip2 > ${INSTALL_PATH}/${file}
-  fi
-  echo "✅ ${INSTALL_PATH}/${file}"
-done
+echo "✅ ${INSTALL_PATH}/${URL}"

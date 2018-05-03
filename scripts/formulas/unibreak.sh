@@ -38,33 +38,34 @@ function prepare() {
 # executed inside the lib src dir
 function build() {
 
+	_LDFLAGS=
+	_CFLAGS=
+
 	if [ "$TYPE" == "osx" ] ; then
 		# set flags for osx 32 & 64 bit fat lib
-		./configure LDFLAGS="-arch i386 -stdlib=libstdc++ -arch x86_64 -Xarch_x86_64 -stdlib=libc++" \
-					CFLAGS="-Os -arch i386 -stdlib=libstdc++ -arch x86_64 -Xarch_x86_64 -stdlib=libc++" \
-					--prefix=$BUILD_ROOT_DIR \
-					--disable-shared
-
-		make -j${PARALLEL_MAKE}
-		make install
+		_LDFLAGS="-arch i386 -stdlib=libstdc++ -arch x86_64 -Xarch_x86_64 -stdlib=libc++"
+		_CFLAGS="-Os -arch i386 -stdlib=libstdc++ -arch x86_64 -Xarch_x86_64 -stdlib=libc++" 
 	fi
+
+	./configure LDFLAGS=${_LDFLAGS} CFLAGS=${_CFLAGS} --prefix=${BUILD_ROOT_DIR} --disable-shared
+
+	make -j${PARALLEL_MAKE}
+	make install
 
 }
 
 # executed inside the lib src dir, first arg $1 is the dest libs dir root
 function copy() {
-	if [ "$TYPE" == "osx" ] ; then
-		mkdir -p $1/include/
-		cp -v $BUILD_ROOT_DIR/include/graphemebreak.h $1/include/
-		cp -v $BUILD_ROOT_DIR/include/linebreak.h $1/include/
-		cp -v $BUILD_ROOT_DIR/include/linebreakdef.h $1/include/
-		cp -v $BUILD_ROOT_DIR/include/unibreakbase.h $1/include/
-		cp -v $BUILD_ROOT_DIR/include/unibreakdef.h $1/include/
-		cp -v $BUILD_ROOT_DIR/include/wordbreak.h $1/include/
+	mkdir -p $1/include/
+	cp -v $BUILD_ROOT_DIR/include/graphemebreak.h $1/include/
+	cp -v $BUILD_ROOT_DIR/include/linebreak.h $1/include/
+	cp -v $BUILD_ROOT_DIR/include/linebreakdef.h $1/include/
+	cp -v $BUILD_ROOT_DIR/include/unibreakbase.h $1/include/
+	cp -v $BUILD_ROOT_DIR/include/unibreakdef.h $1/include/
+	cp -v $BUILD_ROOT_DIR/include/wordbreak.h $1/include/
 
-		mkdir -p $1/lib/$TYPE/
-		cp -R $BUILD_ROOT_DIR/lib/libunibreak.a $1/lib/$TYPE/
-	fi
+	mkdir -p $1/lib/$TYPE/
+	cp -R $BUILD_ROOT_DIR/lib/libunibreak.a $1/lib/$TYPE/
 
 	# copy license file
 	rm -rf $1/license # remove any older files if exists

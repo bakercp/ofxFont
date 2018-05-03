@@ -7,7 +7,7 @@
 # array of build types supported by this formula
 # you can delete this to implicitly support *all* types
 
-FORMULA_TYPES=( "osx" )
+FORMULA_TYPES=( "osx" "linux" "linux64" )
 
 VER=0.3.0
 
@@ -21,9 +21,15 @@ function download() {
 	# mv $fileName raqm
 	# rm $fileName.tar.gz
 
-	git clone -b linebreaking https://github.com/HOST-Oman/libraqm.git raqm
+	# git clone -b linebreaking https://github.com/HOST-Oman/libraqm.git raqm
+	git clone https://github.com/HOST-Oman/libraqm.git raqm
 	cd raqm;
-	autoreconf --force --install --verbose
+	git checkout v0.5.0
+
+	./autogen.sh
+	# Autogen should take care of all of this.
+	# autoreconf --force --install --verbose
+	# echo "EXTRA_DIST=" > gtk-doc.make
 }
 
 # prepare the build environment, executed inside the lib src dir
@@ -36,7 +42,6 @@ function prepare() {
 function build() {
 
 	if [ "$TYPE" == "osx" ] ; then
-
 		# Don't forget the CXXFLAGS for the c++ components.
 		./configure PKG_CONFIG="$BUILD_ROOT_DIR/bin/pkg-config" \
 					PKG_CONFIG_PATH="$BUILD_ROOT_DIR/lib/pkgconfig" \
@@ -58,22 +63,29 @@ function build() {
 					--disable-gtk-doc-html \
 					--with-glib=no \
 					--with-gobject=no
-
-		make -j${PARALLEL_MAKE}
-		make install
-
+  else
+		./configure \
+		--prefix=$BUILD_ROOT_DIR \
+		--disable-dependency-tracking \
+		--enable-introspection=yes \
+		--enable-static=yes \
+		--enable-shared=no \
+		--disable-gtk-doc \
+		--disable-gtk-doc-html
 	fi
+
+	make -j${PARALLEL_MAKE}
+	make install
+
 }
 
 # executed inside the lib src dir, first arg $1 is the dest libs dir root
 function copy() {
-	if [ "$TYPE" == "osx" ] ; then
-		mkdir -p $1/include/
-		cp -Rv $BUILD_ROOT_DIR/include/raqm.h $1/include/
+	mkdir -p $1/include/
+	cp -Rv $BUILD_ROOT_DIR/include/raqm.h $1/include/
 
-		mkdir -p $1/lib/$TYPE/
-		cp -Rv $BUILD_ROOT_DIR/lib/libraqm.a $1/lib/$TYPE/
-	fi
+	mkdir -p $1/lib/$TYPE/
+	cp -Rv $BUILD_ROOT_DIR/lib/libraqm.a $1/lib/$TYPE/
 
 	# copy license file
 	rm -rf $1/license # remove any older files if exists
