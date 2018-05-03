@@ -37,7 +37,8 @@ void ofApp::emojiTest()
     // 1. Get a reference to the FTFontCache.
     auto& cache = ofxText::FTFontCache::instance();
 
-    auto fontPath = "verdana.ttf";
+    auto fontPath = "Roboto-Regular.ttf
+";
 
 //    // We can get an FT_Face from the cache. The FT_Face is owned by the cache.
 //    ofxText::FTFaceId* pFaceId_0 = cache.getFaceIdForPathAndFaceIndex(fontPath, 0);
@@ -71,7 +72,7 @@ void ofApp::emojiTest()
 //
 //    assert(face_0 == size_0->face);
 
-  
+
 
 
 
@@ -101,7 +102,7 @@ void ofApp::emojiTest()
 //        std::cout << face->family_name << std::endl;
 //    }
 
-    
+
 
 //    /// Step 6. Get the glyph for the single codepoint.
 ////    const ofxFontGlyph* glyph = font->getGlyphByCodePoint(txt[0]);
@@ -125,7 +126,7 @@ void ofApp::emojiTest()
 //
 ////    std::string codePoints = "😃😇😍😜😸🙈🐺🐰👽🐉💰🏡🎅🍪🍕🚀🚻💩📷📦1⃣2⃣3⃣4⃣5⃣6⃣7⃣8⃣9⃣0⃣💏👩‍❤️‍💋‍👨👨‍❤️‍💋‍👨👩‍❤️‍💋‍👩💑👩‍❤️‍👨👨‍❤️‍👨👩‍❤️‍👩👪👨‍👩‍👦👨‍👩‍👧👨‍👩‍👧‍👦👨‍👩‍👦‍👦👨‍👩‍👧‍👧👨‍👨‍👦👨‍👨‍👧👨‍👨‍👧‍👦👨‍👨‍👦‍👦👨‍👨‍👧‍👧👩‍👩‍👦👩‍👩‍👧👩‍👩‍👧‍👦👩‍👩‍👦‍👦👩‍👩‍👧‍👧👁‍🗨";
 
-    
+
 
 
 //    font->loadGlyphs(codePoints);

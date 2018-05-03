@@ -18,7 +18,7 @@ const struct {
 #include FT_ERRORS_H
 
 
-std::string ofApp::FT_ERROR_TO_STRING(int error)
+std::string FT_ERROR_TO_STRING(int error)
 {
     return std::to_string(FT_Errors[error].code) + ": " + FT_Errors[error].message;
 }
@@ -41,7 +41,7 @@ void ofApp::setup()
     FT_Face face = NULL;
     FT_Error ft_error;
 
-    std::string s = ofToDataPath("verdana.ttf", true);
+    std::string s = ofToDataPath("Roboto-Regular.ttf", true);
 
     std::cout << s << std::endl;
     std::cout << s.data() << std::endl;
@@ -144,5 +144,6 @@ void ofApp::setup()
     FT_Done_Face (face);
     FT_Done_FreeType (ft_library);
 
+    ofLogNotice() << "Exiting.";
+    ofExit();
 }
-

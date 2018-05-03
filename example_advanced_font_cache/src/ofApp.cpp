@@ -9,7 +9,7 @@
 
 void ofApp::setup()
 {
-    std::string path = "verdana.ttf";
+    std::string path = "Roboto-Regular.ttf";
 
     // 1. Get a reference to the FTFontCache.
     auto& cache = ofxText::FTFontCache::instance();
@@ -49,7 +49,7 @@ void ofApp::setup()
 
         // Make sure there is only one FT_Face cached.
         assert(cache._faceIdCache.size() == 1);
-        
+
         FT_Face face_1 = cache.getFace(faceId_0, sizeId_0);
 
         // Make sure the instances are the same.
@@ -87,7 +87,7 @@ void ofApp::setup()
 //        std::cout << ftFaceToString(face) << std::endl;
 //    }
 
-
+    ofLogNotice() << "Finished.";
     ofExit();
 }
 
