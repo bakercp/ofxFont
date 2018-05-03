@@ -26,8 +26,6 @@ function download() {
 
 # prepare the build environment, executed inside the lib src dir
 function prepare() {
-	# initialize the repository
-
 	# generate the configure script if it's not there
 	if [ ! -f configure ] ; then
 		./bootstrap
@@ -44,10 +42,10 @@ function build() {
 	if [ "$TYPE" == "osx" ] ; then
 		# set flags for osx 32 & 64 bit fat lib
 		_LDFLAGS="-arch i386 -stdlib=libstdc++ -arch x86_64 -Xarch_x86_64 -stdlib=libc++"
-		_CFLAGS="-Os -arch i386 -stdlib=libstdc++ -arch x86_64 -Xarch_x86_64 -stdlib=libc++" 
+		_CFLAGS="-Os -arch i386 -stdlib=libstdc++ -arch x86_64 -Xarch_x86_64 -stdlib=libc++"
 	fi
 
-	./configure LDFLAGS=${_LDFLAGS} CFLAGS=${_CFLAGS} --prefix=${BUILD_ROOT_DIR} --disable-shared
+	./configure LDFLAGS="${_LDFLAGS}" CFLAGS="${_CFLAGS}" --prefix="${BUILD_ROOT_DIR}" --disable-shared
 
 	make -j${PARALLEL_MAKE}
 	make install

@@ -16,17 +16,11 @@ VER=0.19.7
 function download() {
 	local fileName=fribidi-$VER
 
-	curl -LO http://fribidi.org/download/$fileName.tar.bz2
-	curl -LO http://fribidi.org/download/$fileName.tar.bz2.sha256
+	curl -LO https://github.com/fribidi/fribidi/releases/download/$VER/$fileName.tar.bz2
 
-	if [ "$(shasum -a 256 -c $fileName.tar.bz2.sha256 | awk '{print $2}')" = "OK" ] ;  then
-		tar -xf $fileName.tar.bz2
-		mv $fileName fribidi
-		rm $fileName.tar.bz2
-		rm $fileName.tar.bz2.sha256
-	else
-		echoWarning "Invalid shasum for $fileName.tar.bz2."
-	fi
+	tar -xf $fileName.tar.bz2
+	mv $fileName fribidi
+	rm $fileName.tar.bz2
 }
 
 # executed inside the lib src dir

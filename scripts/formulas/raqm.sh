@@ -25,16 +25,14 @@ function download() {
 	git clone https://github.com/HOST-Oman/libraqm.git raqm
 	cd raqm;
 	git checkout v0.5.0
-
-	./autogen.sh
-	# Autogen should take care of all of this.
-	# autoreconf --force --install --verbose
-	# echo "EXTRA_DIST=" > gtk-doc.make
 }
 
 # prepare the build environment, executed inside the lib src dir
 function prepare() {
-	echo "Preparing."
+	# generate the configure script if it's not there
+	if [ ! -f configure ] ; then
+		./autogen.sh
+	fi
 }
 
 
