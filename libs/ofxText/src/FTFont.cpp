@@ -36,6 +36,7 @@ FTFont::~FTFont()
 bool FTFont::setup(const FTFontSettings& settings)
 {
     auto& cache = FTFontCache::instance();
+    return true;
 //
 //    // Get the cached FT_Face face from the cache.
 ////    FT_Face _ftFace = cache.getFTFace(this);
