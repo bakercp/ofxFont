@@ -7,16 +7,23 @@ mkdir -p ${INSTALL_PATH}
 
 echo "Installing ${THIS_NAME} data ..."
 
-echo ${INSTALL_PATH}
+INSTALL_PATH=${INSTALL_PATH}
+mkdir -p ${INSTALL_PATH}
+BASE_URL="https://fonts.google.com/download?family="
+FILES=(
+  "Roboto"
+  "Lato"
+  "Raleway"
+  "Oswald"
+  "Playfair+Display"
+)
 
-URL="https://fonts.google.com/download?family=Roboto|Lato|Raleway|Oswald|Playfair%20"
-FILE="fonts.zip"
-if ! [ -f ${INSTALL_PATH}/${FILE} ]; then
-  echo "Downloading ${URL}"
-  curl -L --progress-bar ${URL} > ${INSTALL_PATH}/${FILE}
-  pushd ${INSTALL_PATH}
-  unzip ${FILE}
-  popd
-fi
-
-echo "✅ ${INSTALL_PATH}/${URL}"
+for file in "${FILES[@]}"
+do
+  if ! [ -f ${INSTALL_PATH}/${file} ]; then
+    echo "Downloading ${file}"
+    curl -L --progress-bar "${BASE_URL}${file}" > "${INSTALL_PATH}/${file}.zip"
+    unzip "${INSTALL_PATH}/${file}.zip" -d "${INSTALL_PATH}/${file}"
+  fi
+  echo "✅ ${INSTALL_PATH}/${file}"
+done
