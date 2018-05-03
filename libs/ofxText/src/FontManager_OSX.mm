@@ -21,34 +21,35 @@ namespace Text {
 
 
 // converts a CoreText weight (-1 to +1) to a standard weight (100 to 900)
-static int convertWeight(float weight) {
-  if (weight <= -0.8f)
-    return 100;
-  else if (weight <= -0.6f)
-    return 200;
-  else if (weight <= -0.4f)
-    return 300;
-  else if (weight <= 0.0f)
-    return 400;
-  else if (weight <= 0.25f)
-    return 500;
-  else if (weight <= 0.35f)
-    return 600;
-  else if (weight <= 0.4f)
-    return 700;
-  else if (weight <= 0.6f)
-    return 800;
-  else
-    return 900;
+static int convertWeight(float weight)
+{
+    if (weight <= -0.8f)
+        return 100;
+    else if (weight <= -0.6f)
+        return 200;
+    else if (weight <= -0.4f)
+        return 300;
+    else if (weight <= 0.0f)
+        return 400;
+    else if (weight <= 0.25f)
+        return 500;
+    else if (weight <= 0.35f)
+        return 600;
+    else if (weight <= 0.4f)
+        return 700;
+    else if (weight <= 0.6f)
+        return 800;
+    else
+        return 900;
 }
 
 // converts a CoreText width (-1 to +1) to a standard width (1 to 9)
-static int convertWidth(float unit) {
-  if (unit < 0) {
-    return 1 + (1 + unit) * 4;
-  } else {
-    return 5 + unit * 4;
-  }
+static int convertWidth(float unit)
+{
+    if (unit < 0)
+        return 1 + (1 + unit) * 4;
+    else
+        return 5 + unit * 4;
 }
 
 
@@ -123,17 +124,20 @@ CTFontDescriptorRef getFontDescriptor(const FontDescriptor& desc)
     NSMutableDictionary *attrs = [NSMutableDictionary dictionary];
     CTFontSymbolicTraits symbolicTraits = 0;
 
-    if (!desc.postscriptName.empty()) {
+    if (!desc.postscriptName.empty())
+    {
         NSString *postscriptName = [NSString stringWithUTF8String:desc.postscriptName.data()];
         attrs[(id)kCTFontNameAttribute] = postscriptName;
     }
 
-    if (!desc.family.empty()) {
+    if (!desc.family.empty())
+    {
         NSString *family = [NSString stringWithUTF8String:desc.family.data()];
         attrs[(id)kCTFontFamilyNameAttribute] = family;
     }
 
-    if (!desc.style.empty()) {
+    if (!desc.style.empty())
+    {
         NSString *style = [NSString stringWithUTF8String:desc.style.data()];
         attrs[(id)kCTFontStyleNameAttribute] = style;
     }
@@ -154,7 +158,8 @@ CTFontDescriptorRef getFontDescriptor(const FontDescriptor& desc)
     if (desc.width == FontWidthExpanded)
         symbolicTraits |= kCTFontExpandedTrait;
 
-    if (symbolicTraits) {
+    if (symbolicTraits)
+    {
         NSDictionary *traits = @{(id)kCTFontSymbolicTrait:[NSNumber numberWithUnsignedInt:symbolicTraits]};
         attrs[(id)kCTFontTraitsAttribute] = traits;
     }
@@ -198,11 +203,13 @@ std::vector<FontDescriptor> FontManager::findFonts(const FontDescriptor& desc)
         return ma < mb ? NSOrderedAscending : ma > mb ? NSOrderedDescending : NSOrderedSame;
     }];
 
-    for (id m in sorted) {
+    for (id m in sorted)
+    {
         CTFontDescriptorRef match = (CTFontDescriptorRef) m;
         int mb = metricForMatch((CTFontDescriptorRef) m, desc);
 
-        if (mb < 10000) {
+        if (mb < 10000)
+        {
             results.push_back(createFontDescriptor(match));
         }
     }
@@ -220,10 +227,12 @@ CTFontDescriptorRef findBest(const FontDescriptor& desc, NSArray *matches)
     CTFontDescriptorRef best = NULL;
     int bestMetric = INT_MAX;
 
-    for (id m in matches) {
+    for (id m in matches)
+    {
         int metric = metricForMatch((CTFontDescriptorRef) m, desc);
 
-        if (metric < bestMetric) {
+        if (metric < bestMetric)
+        {
             bestMetric = metric;
             best = (CTFontDescriptorRef) m;
         }
@@ -245,9 +254,8 @@ FontDescriptor FontManager::findFont(const FontDescriptor& desc)
     NSArray *matches = (NSArray *) CTFontDescriptorCreateMatchingFontDescriptors(descriptor, NULL);
 
     // if there was no match, try again but only try to match traits
-    if ([matches count] == 0) {
-        std::cout << "no matches!" << std::endl;
-
+    if ([matches count] == 0)
+    {
         [matches release];
         NSSet *set = [NSSet setWithObjects:(id)kCTFontTraitsAttribute, nil];
         matches = (NSArray *) CTFontDescriptorCreateMatchingFontDescriptors(descriptor, (CFSetRef) set);
@@ -257,7 +265,8 @@ FontDescriptor FontManager::findFont(const FontDescriptor& desc)
     CTFontDescriptorRef best = findBest(desc, matches);
       
     // if we found a match, generate and return a URL for it
-    if (best) {    
+    if (best)
+    {
         res = createFontDescriptor(best);
     }
 
@@ -272,7 +281,7 @@ FontDescriptor FontManager::substituteFont(const std::string& postscriptName,
 {
     FontDescriptor res;
 
-    // create a font descriptor to find the font by its postscript name
+    // Create a font descriptor to find the font by its postscript name.
     // we don't use CTFontCreateWithName because that supports font
     // names other than the postscript name but prints warnings.
     NSString *ps = [NSString stringWithUTF8String:postscriptName.data()];

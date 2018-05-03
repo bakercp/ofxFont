@@ -16,6 +16,6 @@ class ofApp: public ofBaseApp
 {
 public:
     void setup() override;
-	void draw() override;
-	void update() override;
+    std::string FT_ERROR_TO_STRING(int error);
+
 };

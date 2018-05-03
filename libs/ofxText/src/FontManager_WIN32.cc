@@ -149,8 +149,8 @@ FontDescriptor resultFromFont(IDWriteFont *font) {
 	  res.family = family;
 	  res.style = style;
 	  res.weight = (FontWeight)font->GetWeight();
-	res.width = (FontWidth)font->GetStretch();
-	res.italic = font->GetStyle() == DWRITE_FONT_STYLE_ITALIC;
+        res.width = (FontWidth)font->GetStretch();
+        res.italic = font->GetStyle() == DWRITE_FONT_STYLE_ITALIC;
 		res.monospace = monospace;
 
       delete psName;
@@ -171,7 +171,7 @@ FontDescriptor resultFromFont(IDWriteFont *font) {
 }
 
 std::vector<FontDescriptor> FontManager::getAvailableFonts() {
-	std::vector<FontDescriptor> res;
+    std::vector<FontDescriptor> res;
   int count = 0;
 
   IDWriteFactory *factory = NULL;

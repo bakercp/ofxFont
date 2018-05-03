@@ -147,17 +147,18 @@ FontDescriptor createFontDescriptor(FcPattern *pattern) {
   return result;
 }
 
-std::vector<FontDescriptor> getResultSet(FcFontSet *fs) {
+std::vector<FontDescriptor> getResultSet(FcFontSet *fs)
+{
     std::vector<FontDescriptor> res;
 
     if (!fs)
         return res;
 
-  for (int i = 0; i < fs->nfont; i++) {
-    res.push_back(createFontDescriptor(fs->fonts[i]));
-  }
+    for (int i = 0; i < fs->nfont; i++) {
+        res.push_back(createFontDescriptor(fs->fonts[i]));
+    }
 
-  return res;
+    return res;
 }
 
 std::vector<FontDescriptor> FontManager::getAvailableFonts() {
