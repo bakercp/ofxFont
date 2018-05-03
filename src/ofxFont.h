@@ -8,6 +8,8 @@
 #pragma once
 
 
+#include "raqm.h"
+
 #include "ofx/Text/FontManager.h"
 
 #include "ofx/Text/FTFont.h"
@@ -17,4 +19,3 @@
 
 
 namespace ofxText = ofx::Text;
-
