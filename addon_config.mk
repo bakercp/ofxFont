@@ -4,3 +4,12 @@ meta:
 	ADDON_AUTHOR = bakercp
 	ADDON_TAGS = "font" "typography" "text"
 	ADDON_URL = http://github.com/bakercp/ofxFont
+
+common:
+	# None
+
+osx:
+	# None
+
+linux64:
+	ADDON_PKG_CONFIG_LIBRARIES = harfbuzz fribidi libunibreak
