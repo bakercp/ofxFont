@@ -17,7 +17,7 @@
 namespace ofx {
 namespace Text {
 
-
+    
 /// \brief A Font Manager.
 ///
 /// The FontManager consists of a set of utilities for finding, listing and
@@ -41,6 +41,13 @@ public:
     ///
     /// \returns an array of font descriptors matching a query font descriptor.
     static std::vector<FontDescriptor> findFonts(const FontDescriptor& descriptor);
+
+    /// \brief Find any font.
+    ///
+    /// This method always returns a valid path.
+    ///
+    /// \returns a FontDescriptor with a valid path.
+    static FontDescriptor findFont();
 
     /// \brief Find a font that best matches the given descriptor.
     ///
@@ -70,8 +77,8 @@ public:
     /// \returns a FontDescriptor that covers the required Unicode codepoints.
     static FontDescriptor substituteFont(const std::string& postscriptName,
                                          const std::string& utf8Text);
-
+    
 };
 
-
+    
 } } // namespace ofx::Text

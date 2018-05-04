@@ -6,10 +6,23 @@
 
 
 #include "ofx/Text/FTFontSettings.h"
+#include "ofx/Text/FTFontCache.h"
 
 
 namespace ofx {
 namespace Text {
+
+
+FTFontSettings::FTFontSettings()
+{
+}
+    
+    
+FTFontSettings::FTFontSettings(const std::filesystem::path& fontPath,
+                               float size):
+    FTFontSettings(FTFaceDescriptor(fontPath), FTSizeDescriptor(size))
+{
+}
 
 
 FTFontSettings::FTFontSettings(const FontDescriptor& fontDescriptor,
@@ -21,20 +34,28 @@ FTFontSettings::FTFontSettings(const FontDescriptor& fontDescriptor,
 
 FTFontSettings::FTFontSettings(const FontDescriptor& fontDescriptor,
                                const FTSizeDescriptor& fontSizeDescriptor):
-    _fontDescriptor(fontDescriptor),
-    _fontSizeDescriptor(fontSizeDescriptor)
+    FTFontSettings(FTFontCache::instance().getFaceDescriptorForFontDescriptor(fontDescriptor),
+                   fontSizeDescriptor)
 {
 }
 
 
+FTFontSettings::FTFontSettings(const FTFaceDescriptor& faceDescriptor,
+                               const FTSizeDescriptor& fontSizeDescriptor):
+    _faceDescriptor(faceDescriptor),
+    _fontSizeDescriptor(fontSizeDescriptor)
+{
+}
+
+    
 FTFontSettings::~FTFontSettings()
 {
 }
 
 
-FontDescriptor FTFontSettings::fontDescriptor() const
+FTFaceDescriptor FTFontSettings::faceDescriptor() const
 {
-    return _fontDescriptor;
+    return _faceDescriptor;
 }
 
 
@@ -46,8 +67,9 @@ FTSizeDescriptor FTFontSettings::fontSizeDescriptor() const
 
 bool FTFontSettings::operator < (const FTFontSettings& other) const
 {
-    if (_fontDescriptor != other._fontDescriptor)
-        return _fontDescriptor < other._fontDescriptor;
+    if (_faceDescriptor != other._faceDescriptor)
+        return _faceDescriptor < other._faceDescriptor;
+    
     return _fontSizeDescriptor < other._fontSizeDescriptor;
 }
 

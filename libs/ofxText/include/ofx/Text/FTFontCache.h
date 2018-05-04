@@ -22,12 +22,12 @@ namespace ofx {
 namespace Text {
 
 
-class FTFaceCache
-{
-public:
-    std::vector<std::shared_ptr<FT_Face>> _faces;
-    ofBuffer _buffer;
-};
+//class FTFaceCache
+//{
+//public:
+//    std::vector<std::shared_ptr<FT_Face>> _faces;
+//    ofBuffer _buffer;
+//};
 
 
 
@@ -83,7 +83,7 @@ public:
     /// \returns An FT_Library pointer to the initialized Freetype Library.
     FT_Library ftLibrary();
 
-//private:
+private:
     FTFontCache();
     FTFontCache(const FTFontCache&) = delete;
     FTFontCache& operator = (const FTFontCache&) = delete;
@@ -95,7 +95,7 @@ public:
     /// \brief Get an FT_Face with an active size.
     ///
     /// This function returns an FT_Face with an active FT_Size specified by
-    /// the given FTSizeDescriptor.  The returned FT_Face object is always
+    /// the given FTSizeDescriptor. The returned FT_Face object is always
     /// owned by the cache. Users should not try to free the FT_Face.
     ///
     /// The user should not modify the returned FT_Face object, as it may be
@@ -104,16 +104,18 @@ public:
     /// FT_Set_Transform on the face). If a glyph should be transformed, this
     /// should occur after the glyph has been loaded.
     ///
-    /// This should return a valid FT_Face. In the even that an invalid font is
+    /// This should return a valid FT_Face. In the event that an invalid font is
     /// requested and no fallback option is available, this will log a fatal
     /// error and return a nullptr.
     ///
     /// \param faceDescriptor The FTFaceDescriptor to load.
     /// \param sizeDescriptor The FTSizeDescriptor to load.
     /// \returns an FT_Face that is owned by the cache or nullptr on failure.
-    FT_Face getFace(const FTFaceDescriptor& faceDescriptor,
-                    const FTSizeDescriptor& sizeDescriptor) const;
+    std::shared_ptr<struct FT_FaceRec_> getFace(const FTFaceDescriptor& faceDescriptor,
+                                                const FTSizeDescriptor& sizeDescriptor) const;
 
+    FTFaceDescriptor getFaceDescriptorForFontDescriptor(const FontDescriptor& fontDescriptor);
+    
     /// \brief Get a pointer to the cached memory for a FTFaceDescriptor.
     ///
     /// Fonts that share the same fontPath will share the same underlying
@@ -151,15 +153,15 @@ public:
     /// \param descriptor The font descriptor to to query.
     /// \returns a freetype face index >= 0 for success, or < 0 for failure.
     int64_t getFaceIndexForFontDescriptor(const FontDescriptor& descriptor) const;
-
-//    /// \brief Cached faces.
-//    ///
-//    /// FT_Faces are cached here and associated with a specific FTFaceId.
-//    ///
-//    /// Each FT_Face is loaded from memory mapped and cached in the
-//    /// _fontFileBuffers. Each FT_Face represents an FT_Face that has
-//    /// has been sized with FT_Set_Char_Size upon creation.
-    mutable std::map<FTFaceDescriptor, FT_Face> _faceIdCache;
+    
+    /// \brief Cached faces.
+    ///
+    /// FT_Faces are cached here and associated with a specific FTFaceDescriptor.
+    ///
+    /// Each FT_Face is loaded from memory mapped and cached in the
+    /// _fontFileBuffers. Each FT_Face represents an FT_Face that has
+    /// has been sized with FT_Set_Char_Size upon creation.
+    mutable std::map<FTFaceDescriptor, std::shared_ptr<struct FT_FaceRec_>> _faceIdCache;
 
     /// \brief A collection of memory mapped font file buffers.
     mutable std::unordered_map<std::string, std::shared_ptr<const ofBuffer>> _fontBufferCache;
@@ -178,6 +180,8 @@ public:
     /// \brief Cache settings;
     Settings _settings;
 
+    friend FTFontSettings;
+    
 };
 
 

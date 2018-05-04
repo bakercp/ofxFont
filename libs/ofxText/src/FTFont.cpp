@@ -35,11 +35,15 @@ FTFont::~FTFont()
 
 bool FTFont::setup(const FTFontSettings& settings)
 {
-    auto& cache = FTFontCache::instance();
-    return true;
+//    auto& cache = FTFontCache::instance();
+//
+//    _faceDescriptor = cache.getFaceDescriptorForFontDescriptor(settings.fontDescriptor());
+//    _sizeDescriptor = settings.fontSizeDescriptor();
 //
 //    // Get the cached FT_Face face from the cache.
-////    FT_Face _ftFace = cache.getFTFace(this);
+//    auto _face = cache.getFace(_faceDescriptor, _sizeDescriptor);
+//    
+//    FT_Face _ftFace = _face.get();
 //
 //    // We attempt to cache all of the metrics in for the given face.
 //    if (_ftFace != nullptr)

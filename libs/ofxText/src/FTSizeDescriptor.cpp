@@ -12,12 +12,18 @@ namespace ofx {
 namespace Text {
 
 
+FTSizeDescriptor::FTSizeDescriptor():
+    FTSizeDescriptor(DEFAULT_SIZE, DEFAULT_RESOLUTION_DPI)
+{
+}
+    
+    
 FTSizeDescriptor::FTSizeDescriptor(float size, FT_UInt resolution):
-    FTSizeDescriptor::FTSizeDescriptor(size * POINTS_TO_FRACTIONAL_POINTS,
-                       size * POINTS_TO_FRACTIONAL_POINTS,
-                       resolution,
-                       resolution,
-                       DEFAULT_HORIZONTAL_RESOLUTION_SCALER)
+    FTSizeDescriptor(size * POINTS_TO_FRACTIONAL_POINTS,
+                     size * POINTS_TO_FRACTIONAL_POINTS,
+                     resolution,
+                     resolution,
+                     DEFAULT_HORIZONTAL_RESOLUTION_SCALER)
 {
 }
 

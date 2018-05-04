@@ -6,6 +6,7 @@
 
 
 #include "ofx/Text/FTFaceDescriptor.h"
+#include "ofx/Text/FontManager.h"
 #include "ofUtils.h"
 
 
@@ -13,6 +14,12 @@ namespace ofx {
 namespace Text {
 
 
+FTFaceDescriptor::FTFaceDescriptor():
+    FTFaceDescriptor(FontManager::findFont().path, DEFAULT_FACE_INDEX)
+{
+}
+
+    
 
 FTFaceDescriptor::FTFaceDescriptor(const std::filesystem::path& path):
     FTFaceDescriptor(path, DEFAULT_FACE_INDEX)

@@ -36,9 +36,7 @@ void ofApp::emojiTest()
 {
     // 1. Get a reference to the FTFontCache.
     auto& cache = ofxText::FTFontCache::instance();
-
-    auto fontPath = "Roboto-Regular.ttf
-";
+    auto fontPath = "Roboto-Regular.ttf";
 
 //    // We can get an FT_Face from the cache. The FT_Face is owned by the cache.
 //    ofxText::FTFaceId* pFaceId_0 = cache.getFaceIdForPathAndFaceIndex(fontPath, 0);

@@ -11,7 +11,7 @@
 namespace ofx {
 namespace Text {
 
-
+    
 ofJson FontDescriptor::toJSON() const
 {
     ofJson json;

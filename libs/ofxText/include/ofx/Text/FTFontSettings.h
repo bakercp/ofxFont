@@ -9,6 +9,7 @@
 
 
 #include "ofx/Text/FontDescriptor.h"
+#include "ofx/Text/FTFaceDescriptor.h"
 #include "ofx/Text/FTSizeDescriptor.h"
 
 
@@ -16,29 +17,43 @@ namespace ofx {
 namespace Text {
 
 
-/// \brief A settings object to describe a given ofFTFont.
+/// \brief A settings object to describe a given FTFont.
 ///
 /// This class is used to configure an FTFont and is used as a key for the
 /// FTFont cache present in FTFontCache.
 class FTFontSettings
 {
 public:
+    /// \brief Create an default FTFontSettings.
+    FTFontSettings();
+    
+    /// \brief Create an FTFontSettings with the given parameters.
+    /// \param fontPath A path to a given font.
+    /// \param size The point size of the font.
+    FTFontSettings(const std::filesystem::path& fontPath, float size);
+
     /// \brief Create an FTFontSettings with the given parameters.
     /// \param fontDescriptor The font descriptor.
     /// \param size The point size of the font.
     FTFontSettings(const FontDescriptor& fontDescriptor, float size);
-
+    
     /// \brief Create an FTFontSettings with the given parameters.
     /// \param fontDescriptor The font descriptor.
     /// \param fontSizeDescriptor The font size descriptor.
     FTFontSettings(const FontDescriptor& fontDescriptor,
                    const FTSizeDescriptor& fontSizeDescriptor);
 
+    /// \brief Create an FTFontSettings with the given parameters.
+    /// \param faceDescriptor The face descriptor.
+    /// \param fontSizeDescriptor The font size descriptor.
+    FTFontSettings(const FTFaceDescriptor& faceDescriptor,
+                   const FTSizeDescriptor& fontSizeDescriptor);
+
     /// \brief Destroy the font settings.
     virtual ~FTFontSettings();
 
-    /// \returns the font descriptor.
-    FontDescriptor fontDescriptor() const;
+    /// \returns the face descriptor.
+    FTFaceDescriptor faceDescriptor() const;
 
     /// \returns the font size descriptor.
     FTSizeDescriptor fontSizeDescriptor() const;
@@ -48,9 +63,12 @@ public:
     bool operator < (const FTFontSettings& other) const;
 
 private:
-    /// \brief The font descriptor.
-    FontDescriptor _fontDescriptor;
-
+    /// \brief The fallback font.
+    static FTFontSettings _fallback();
+    
+    /// \brief The resolved face descriptor.
+    FTFaceDescriptor _faceDescriptor;
+    
     /// \brief The font size descriptor.
     FTSizeDescriptor _fontSizeDescriptor;
 

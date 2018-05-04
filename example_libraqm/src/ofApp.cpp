@@ -25,61 +25,71 @@ std::string FT_ERROR_TO_STRING(int error)
 
 void ofApp::setup()
 {
-    std::string codePoints = "😃😇😍😜😸🙈🐺🐰👽🐉💰🏡🎅🍪🍕🚀🚻💩📷📦1⃣2⃣3⃣4⃣5⃣6⃣7⃣8⃣9⃣0⃣💏👩‍❤️‍💋‍👨👨‍❤️‍💋‍👨👩‍❤️‍💋‍👩💑👩‍❤️‍👨👨‍❤️‍👨👩‍❤️‍👩👪👨‍👩‍👦👨‍👩‍👧👨‍👩‍👧‍👦👨‍👩‍👦‍👦👨‍👩‍👧‍👧👨‍👨‍👦👨‍👨‍👧👨‍👨‍👧‍👦👨‍👨‍👦‍👦👨‍👨‍👧‍👧👩‍👩‍👦👩‍👩‍👧👩‍👩‍👧‍👦👩‍👩‍👦‍👦👩‍👩‍👧‍👧👁‍🗨";
-
-    const char *fontfile;
+//    std::string codePoints = "😃😇😍😜😸🙈🐺🐰👽🐉💰🏡🎅🍪🍕🚀🚻💩📷📦1⃣2⃣3⃣4⃣5⃣6⃣7⃣8⃣9⃣0⃣💏👩‍❤️‍💋‍👨👨‍❤️‍💋‍👨👩‍❤️‍💋‍👩💑👩‍❤️‍👨👨‍❤️‍👨👩‍❤️‍👩👪👨‍👩‍👦👨‍👩‍👧👨‍👩‍👧‍👦👨‍👩‍👦‍👦👨‍👩‍👧‍👧👨‍👨‍👦👨‍👨‍👧👨‍👨‍👧‍👦👨‍👨‍👦‍👦👨‍👨‍👧‍👧👩‍👩‍👦👩‍👩‍👧👩‍👩‍👧‍👦👩‍👩‍👦‍👦👩‍👩‍👧‍👧👁‍🗨";
+//
+//    const char *fontfile;
     const char *text;
     int i;
     int ret = 1;
-
+//
     raqm_t *rq = NULL;
     raqm_glyph_t *glyphs = NULL;
     size_t count;
     raqm_direction_t dir;
-
-    FT_Library ft_library = NULL;
-    FT_Face face = NULL;
+//
+//    FT_Library ft_library = NULL;
+//    FT_Face face = NULL;
     FT_Error ft_error;
-
-    std::string s = ofToDataPath("Roboto-Regular.ttf", true);
-
-    std::cout << s << std::endl;
-    std::cout << s.data() << std::endl;
-
-    fontfile = s.data();
-
-    std::cout << fontfile << std::endl;
-
-
+//
+//    std::string s = ofToDataPath("Roboto-Regular.ttf", true);
+//
+//    std::cout << s << std::endl;
+//    std::cout << s.data() << std::endl;
+//
+//    fontfile = s.data();
+//
+//    std::cout << fontfile << std::endl;
+//
+//
 //    text = "😃😇😍😜😸🙈🐺🐰👽🐉💰🏡🎅🍪🍕🚀🚻💩📷📦1⃣2⃣3⃣4⃣5⃣6⃣7⃣8⃣9⃣0⃣💏👩‍❤️‍💋‍👨👨‍❤️‍💋‍👨👩‍❤️‍💋‍👩💑👩‍❤️‍👨👨‍❤️‍👨👩‍❤️‍👩👪👨‍👩‍👦👨‍👩‍👧👨‍👩‍👧‍👦👨‍👩‍👦‍👦👨‍👩‍👧‍👧👨‍👨‍👦👨‍👨‍👧👨‍👨‍👧‍👦👨‍👨‍👦‍👦👨‍👨‍👧‍👧👩‍👩‍👦👩‍👩‍👧👩‍👩‍👧‍👦👩‍👩‍👦‍👦👩‍👩‍👧‍👧👁‍🗨";
-
+//
     text = "h";
+//
+//    ft_error = FT_Init_FreeType (&ft_library);
+//    if (ft_error)
+//    {
+//        std::cout << "0 ft_error" << std::endl;
+//        std::cout << FT_ERROR_TO_STRING(ft_error) << std::endl;
+//        goto final;
+//    }
+//
+//    ft_error = FT_New_Face (ft_library, fontfile, 0, &face);
+//
+//    if (ft_error)
+//    {
+//        std::cout << "1 ft_error " << ft_error << std::endl;
+//        std::cout << FT_ERROR_TO_STRING(ft_error) << std::endl;
+//        goto final;
+//    }
+//
+//    ft_error = FT_Set_Char_Size(face, face->units_per_EM, 0, 0, 0);
+//    if (ft_error)
+//    {
+//        std::cout << "2 ft_error" << std::endl;
+//        std::cout << FT_ERROR_TO_STRING(ft_error) << std::endl;
+//        goto final;
+//    }
 
-    ft_error = FT_Init_FreeType (&ft_library);
-    if (ft_error)
-    {
-        std::cout << "0 ft_error" << std::endl;
-        std::cout << FT_ERROR_TO_STRING(ft_error) << std::endl;
-        goto final;
-    }
+    auto& cache = ofxText::FTFontCache::instance();
 
-    ft_error = FT_New_Face (ft_library, fontfile, 0, &face);
-
-    if (ft_error)
-    {
-        std::cout << "1 ft_error " << ft_error << std::endl;
-        std::cout << FT_ERROR_TO_STRING(ft_error) << std::endl;
-        goto final;
-    }
-
-    ft_error = FT_Set_Char_Size(face, face->units_per_EM, 0, 0, 0);
-    if (ft_error)
-    {
-        std::cout << "2 ft_error" << std::endl;
-        std::cout << FT_ERROR_TO_STRING(ft_error) << std::endl;
-        goto final;
-    }
-
+    ofxText::FontDescriptor fontDescriptor;
+    fontDescriptor.postscriptName = "Roboto";
+    
+    ofxText::FTFaceDescriptor faceDescriptor = cache.getFaceDescriptorForFontDescriptor(fontDescriptor);
+    
+    ofxText::FTSizeDescriptor sizeId_0(14);
+    auto face = cache.getFace(faceDescriptor, sizeId_0);
+    
     dir = RAQM_DIRECTION_DEFAULT;
 
     rq = raqm_create();
@@ -97,7 +107,7 @@ void ofApp::setup()
         goto final;
     }
 
-    if (!raqm_set_freetype_face(rq, face))
+    if (!raqm_set_freetype_face(rq, face.get()))
     {
         std::cout << "raqm_set_freetype_face" << std::endl;
         std::cout << FT_ERROR_TO_STRING(ft_error) << std::endl;
@@ -141,8 +151,11 @@ void ofApp::setup()
 
     final:
     raqm_destroy (rq);
-    FT_Done_Face (face);
-    FT_Done_FreeType (ft_library);
+
+    
+    
+    //    FT_Done_Face (face);
+//    FT_Done_FreeType (ft_library);
 
     ofLogNotice() << "Exiting.";
     ofExit();

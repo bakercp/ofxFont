@@ -91,6 +91,9 @@ public:
     }
 
 private:
+    /// \brief The settings representing this font.
+    FTFontSettings _settings;
+    
     /// \brief True Has this font has been initialized.
     bool _isInitialized = false;
 

@@ -23,11 +23,13 @@ namespace Text {
 class FTFaceDescriptor
 {
 public:
-    /// \brief Create a FTFaceId from the given path.
+    FTFaceDescriptor();
+    
+    /// \brief Create a FTFaceDescriptor from the given path.
     /// \param path The font path.
     FTFaceDescriptor(const std::filesystem::path& path);
 
-    /// \brief Create a FTFaceId from the given parameters.
+    /// \brief Create a FTFaceDescriptor from the given parameters.
     /// \param path The font path.
     /// \param faceIndex FT_Open_Face for a detailed description of this parameter.
     FTFaceDescriptor(const std::filesystem::path& path, FT_Long faceIndex);
@@ -53,7 +55,7 @@ public:
     /// \returns true iff this object is not equal to the other.
     bool operator != (const FTFaceDescriptor& other) const;
 
-    /// \returns the json representation of the FTFaceId.
+    /// \returns the json representation of the FTFaceDescriptor.
     ofJson toJSON() const;
 
     enum

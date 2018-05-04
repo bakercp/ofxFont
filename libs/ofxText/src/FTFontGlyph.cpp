@@ -212,9 +212,9 @@
 ////    //        float _verticalAdvance; ///< \brief Advance height for vertical layout.
 ////    //
 ////    //        ofRectangle _boundingBox; ///< \brief The glyph's bounding rectangle.
-////    
+////
 ////    //glyph->_contour = FTFontGlyph::createContour(slot);
-////    
+////
 ////    // Add glyph to map
 ////
 //}
@@ -426,4 +426,4 @@
 //}
 //
 //} } // namespace ofx::Text
-
+//

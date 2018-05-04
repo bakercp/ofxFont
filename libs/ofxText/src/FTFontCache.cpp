@@ -120,7 +120,8 @@ FTFontCache::~FTFontCache()
 
 void FTFontCache::clear()
 {
-//    _faceIdCache.clear();
+    _faceIdCache.clear();
+    _fontBufferCache.clear();
     _fontDescriptorCache.clear();
 }
 
@@ -131,8 +132,8 @@ FT_Library FTFontCache::ftLibrary()
 }
 
     
-FT_Face FTFontCache::getFace(const FTFaceDescriptor& faceDescriptor,
-                             const FTSizeDescriptor& sizeDescriptor) const
+std::shared_ptr<struct FT_FaceRec_> FTFontCache::getFace(const FTFaceDescriptor& faceDescriptor,
+                                                         const FTSizeDescriptor& sizeDescriptor) const
 {
     auto faceIter = _faceIdCache.find(faceDescriptor);
 
@@ -142,18 +143,22 @@ FT_Face FTFontCache::getFace(const FTFaceDescriptor& faceDescriptor,
         
         if (pBuffer && pBuffer->size() > 0)
         {
-            FT_Face face = nullptr;
+            FT_Face _face = nullptr;
             FT_Error error = FT_New_Memory_Face(_library,
                                                 reinterpret_cast<const FT_Byte*>(pBuffer->getData()),
                                                 pBuffer->size(),
                                                 faceDescriptor.faceIndex(),
-                                                &face);
+                                                &_face);
             if (error != 0)
             {
-                ofLogError("FTFontCache::getFaceForFaceId") << "Error Loading Face: " << FT_ERROR_TO_STRING(error) << " : " << faceDescriptor.toJSON().dump(4);
+                ofLogError("FTFontCache::getFace") << "Error Loading Face: " << FT_ERROR_TO_STRING(error) << " : " << faceDescriptor.toJSON().dump(4);
                 return nullptr;
             }
 
+            // Wrap the FT_Face with a shared pointer to automatically call
+            // FT_Done_Face upon destruction.
+            auto face = std::shared_ptr<struct FT_FaceRec_>(_face, FT_Done_Face);
+            
             auto result = _faceIdCache.insert(std::make_pair(faceDescriptor, face));
 
             if (result.second)
@@ -162,19 +167,23 @@ FT_Face FTFontCache::getFace(const FTFaceDescriptor& faceDescriptor,
             }
             else
             {
-                ofLogError("FTFontCache::getFaceForFaceId") << "Unable to insert or load FT_Face into cache.";
+                ofLogError("FTFontCache::getFace") << "Unable to insert or load FT_Face into cache.";
                 return nullptr;
             }
         }
         else
         {
-            ofLogError("FTFontCache::getFaceForFaceId") << "Buffer empty.";
+            ofLogError("FTFontCache::getFace") << "Buffer empty.";
             return nullptr;
         }
     }
+    else
+    {
+        ofLogVerbose("FTFontCache::getFace") << "Face exists.";
+    }
 
     // Ensure that the size is correct.
-    FT_Error error = FT_Set_Char_Size(faceIter->second,
+    FT_Error error = FT_Set_Char_Size(faceIter->second.get(),
                                       sizeDescriptor.charWidth(),
                                       sizeDescriptor.charHeight(),
                                       sizeDescriptor.horzResolution(),
@@ -182,7 +191,7 @@ FT_Face FTFontCache::getFace(const FTFaceDescriptor& faceDescriptor,
 
     if (error != 0)
     {
-        ofLogError("FTFontCache::getFaceForFaceId") << "Error Setting Char Size: " << FT_ERROR_TO_STRING(error) << " : " << faceDescriptor.toJSON().dump(4);
+        ofLogError("FTFontCache::getFace") << "Error Setting Char Size: " << FT_ERROR_TO_STRING(error) << " : " << faceDescriptor.toJSON().dump(4);
         return nullptr;
     }
 
@@ -190,71 +199,20 @@ FT_Face FTFontCache::getFace(const FTFaceDescriptor& faceDescriptor,
 }
 
 
-//FTFaceId* FTFontCache::getFaceIdForPathAndFaceIndex(const std::filesystem::path& _fontPath,
-//                                                    int64_t faceIndex) const
-//{
-//    // Make the font path absolute, if it isn't already.
-//    std::filesystem::path absoluteFontPath = ofToDataPath(_fontPath, true);
-//
-//    // Does the font path exist and is it a regular file?
-//    if (std::filesystem::exists(absoluteFontPath) && std::filesystem::is_regular(absoluteFontPath))
-//    {
-//        // The FaceId that we want.
-//        FTFaceId faceId(absoluteFontPath, faceIndex);
-//
-//        // If we already have it cached, then get it.
-//        auto iter = std::find(_faceIdCache.begin(),
-//                              _faceIdCache.end(),
-//                              faceId);
-//
-//        // Return a pointer to the persistant, existing instance of the FaceId if available.
-//        if (iter != _faceIdCache.end())
-//        {
-//            ofLogVerbose("FTFontCache::getFaceIdForPathAndFaceIndex") << "FaceId is cached: " << faceId.first << ", " << faceId.second;
-//            return &(*iter);
-//        }
-//
-//        // Othewise, create a new instance of the face id and return a pointer to it.
-//        _faceIdCache.push_back(faceId);
-//        return &_faceIdCache.back();
-//    }
-//
-//    ofLogError("FTFontCache::getFaceIdForPathAndFaceIndex") << "Font not found: " << absoluteFontPath.string();
-//    return nullptr;
-//}
-//
-//
-//FTFaceId* FTFontCache::getFaceIdForFontDescriptor(const FontDescriptor& descriptor) const
-//{
-//    // Make the font path absolute, if it isn't already.
-//    std::filesystem::path absoluteFontPath = ofToDataPath(descriptor.path, true);
-//
-//    if (std::filesystem::exists(absoluteFontPath)
-//    &&  std::filesystem::is_regular(absoluteFontPath))
-//    {
-//        int64_t faceIndex = getFaceIndexForFontDescriptor(descriptor);
-//
-//        if (faceIndex >= 0)
-//        {
-//            return getFaceIdForPathAndFaceIndex(absoluteFontPath, faceIndex);
-//        }
-//    }
-//
-//    return getFaceIdForFontDescriptor(FontManager::findFont(descriptor));
-//}
-//
-//
-//FT_Face FTFontCache::getFaceForFontDescriptor(const FontDescriptor& descriptor) const
-//{
-//    FTFaceId* pFaceId = getFaceIdForFontDescriptor(descriptor);
-//
-//    if (pFaceId != nullptr)
-//    {
-//        return getFaceForPathAndFaceIndex(pFaceId->first, pFaceId->second);
-//    }
-//
-//    return nullptr;
-//}
+FTFaceDescriptor FTFontCache::getFaceDescriptorForFontDescriptor(const FontDescriptor& _fontDescriptor)
+{
+    FontDescriptor fontDescriptor = _fontDescriptor;
+    
+    if (!std::filesystem::exists(ofToDataPath(fontDescriptor.path, true)))
+    {
+        fontDescriptor.path.clear();
+        ofLogWarning("FTFontCache::getFaceDescriptorForFontDescriptor") << "Unable to find font: " << _fontDescriptor.path;
+    }
+        
+    fontDescriptor = FontManager::findFont(fontDescriptor);
+    
+    return FTFaceDescriptor(fontDescriptor.path, getFaceIndexForFontDescriptor(fontDescriptor));
+}
 
 
 std::shared_ptr<const ofBuffer> FTFontCache::getBufferForFontPath(const std::filesystem::path& _fontPath) const
@@ -306,7 +264,6 @@ std::vector<FontDescriptor> FTFontCache::getFontDescriptorsForPath(const std::fi
     std::vector<FontDescriptor> results;
 
     FT_Face face;
-    FT_Long i = 0;
     FT_Error error = 0;
 
     error = FT_New_Face(_library, absoluteFontPath.data(), -1, &face);

@@ -24,6 +24,9 @@ namespace Text {
 class FTSizeDescriptor
 {
 public:
+    /// \brief Create a default FTSizeDescriptor.
+    FTSizeDescriptor();
+    
     /// \brief Create a FTSizeDescriptor from the given parameters.
     /// \param size The point size.
     /// \param resolution The horizontal and vertical resolution in pixels per inch.
@@ -80,6 +83,9 @@ public:
 
     enum
     {
+        /// \brief The default point size.
+        DEFAULT_SIZE = 48,
+        
         // \brief 26.6 fractional scaler.
         // Used to convert 26.6 fixed point fractional points to points.
         POINTS_TO_FRACTIONAL_POINTS = 64,

@@ -63,7 +63,7 @@ class FontDescriptor
 public:
     /// \brief The path to the font file in the filesystem.
     ///
-    /// This is not applicable for queries, only for results.
+    /// \note This is not applicable for queries, only for results.
     std::string path;
 
     /// \brief The PostScript name of the font (e.g 'Arial-BoldMT').
