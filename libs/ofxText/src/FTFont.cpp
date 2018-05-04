@@ -164,6 +164,7 @@ bool FTFont::setup(const FTFontSettings& settings)
 //        ofLogFatalError("FTFont::FTFont") << "Unable to load font face for font: " << settings.font();
 //    }
 
+return false;
 }
 
 
