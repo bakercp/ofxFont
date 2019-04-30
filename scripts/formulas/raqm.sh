@@ -9,7 +9,7 @@
 
 FORMULA_TYPES=( "osx" "linux" "linux64" )
 
-VER=0.3.0
+VER=0.5.0
 
 # download the source code and unpack it into LIB_NAME
 function download() {
@@ -24,7 +24,7 @@ function download() {
 	# git clone -b linebreaking https://github.com/HOST-Oman/libraqm.git raqm
 	git clone https://github.com/HOST-Oman/libraqm.git raqm
 	cd raqm;
-	git checkout v0.5.0
+	git checkout v${VER}
 }
 
 # prepare the build environment, executed inside the lib src dir
