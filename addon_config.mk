@@ -11,5 +11,8 @@ common:
 osx:
 	# None
 
+linux:
+	ADDON_PKG_CONFIG_LIBRARIES = harfbuzz fribidi libunibreak
+
 linux64:
 	ADDON_PKG_CONFIG_LIBRARIES = harfbuzz fribidi libunibreak
