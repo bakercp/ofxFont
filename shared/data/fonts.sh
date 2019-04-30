@@ -20,10 +20,12 @@ FILES=(
 
 for file in "${FILES[@]}"
 do
-  if ! [ -f ${INSTALL_PATH}/${file} ]; then
+  # See if the directories exist.
+  if ! [ -d ${INSTALL_PATH}/${file} ]; then
     echo "Downloading ${file}"
     curl -L --progress-bar "${BASE_URL}${file}" > "${INSTALL_PATH}/${file}.zip"
     unzip "${INSTALL_PATH}/${file}.zip" -d "${INSTALL_PATH}/${file}"
+    rm ${INSTALL_PATH}/${file}.zip
   fi
   echo "✅ ${INSTALL_PATH}/${file}"
 done
